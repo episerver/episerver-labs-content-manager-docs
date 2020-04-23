@@ -6,6 +6,8 @@
 
 Link to [nuget](https://nuget.episerver.com/package/?id=EPiServer.Labs.ContentManager) package.
 
+If you find any issues or you have questions/converns please report them in this repository.
+
 ## Introduction
 
 Content Manager is an addon that allows to display flat list of content outside of Edit Mode.
