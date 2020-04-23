@@ -6,7 +6,7 @@
 
 Link to [nuget](https://nuget.episerver.com/package/?id=EPiServer.Labs.ContentManager) package.
 
-If you find any issues or you have questions/converns please report them in this repository.
+If you find any issues or you have questions/concerns then please report them in this repository.
 
 ## Introduction
 
