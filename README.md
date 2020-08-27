@@ -34,7 +34,7 @@ By default there are four tabs:
 
 Tabs on dashboard are configurable. You can hide them or change their order.
 To do that you need to configure `AvailableGadgets` option value:
-```
+```cs
 AvailableGadgets => new[]
 
 {
@@ -52,7 +52,7 @@ and then list of tasks.
 When using full text search, user automatically gets search suggestions.
 Suggestion are enabled by default, but they can be turned off using options:
 
-```
+```cs
 context.Services.Configure<ContentManagerOptions>((options) =>
 {
     options.NotificationReceiversRoles = new[] { "WebEditors" };
@@ -65,7 +65,7 @@ context.Services.Configure<ContentManagerOptions>((options) =>
 By default dashboard title is "Episerver Content Manager", 
 but this value can be changed and localized using "`/contentmanager/dashboard/title`" resource key.
 
-````
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <languages>
   <language name="English" id="en">
@@ -76,7 +76,7 @@ but this value can be changed and localized using "`/contentmanager/dashboard/ti
     </contentmanager>
   </language>
 </languages>
-````
+```
 
 ## Views
 
@@ -109,7 +109,7 @@ To make implementation simpler, the class can inherit from `ContentManagerViewCo
 that already implements `IContentManagerViewConfiguration` interface. 
 Below is an example of view that displays cars blocks:
 
-````
+```cs
 [ServiceConfiguration(typeof(IContentManagerViewConfiguration))]
 public class CarsView : ContentManagerViewConfigurationBase
 {
@@ -130,7 +130,7 @@ public class CarsView : ContentManagerViewConfigurationBase
         return carsFolder;
     }
 }
-````
+```
 
 #### Configuring views using blocks
 
@@ -168,7 +168,7 @@ should be configured as `contentmanager/views/[view-id]/title`.
 
 For example, for cars view, the view ID is "cars", and the XML resource will looks like:
 
-````
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <languages>
   <language name="English" id="en">
@@ -181,7 +181,7 @@ For example, for cars view, the view ID is "cars", and the XML resource will loo
     </contentmanager>
   </language>
 </languages>
-````
+```
 
 #### Filtering views
 
@@ -221,7 +221,7 @@ The interface has `SetItem` method called when item properties are set.
 
 For example on ArticlePage:
 
-````
+```cs
 [SiteContentType(
     GroupName = Global.GroupNames.News,
     GUID = "AEECADF2-3E89-4117-ADEB-F8D43565D2F4")]
@@ -234,7 +234,23 @@ public class ArticlePage : StandardPage, IDashboardItem
         itemModel.Image = PageImage;
     }
 }
-````
+```
+
+And it's the same if you wish to display media files:
+```cs
+[ContentType(GUID = "0A89E464-56D4-449F-AEA8-2BF774AB8730")]
+[MediaDescriptor(ExtensionString = "jpg,jpeg,jpe,ico,gif,bmp,png")]
+public class ImageFile : ImageData, IDashboardItem
+{
+    public virtual string Copyright { get; set; }
+
+    public void SetItem(ItemModel itemModel)
+    {
+        itemModel.Description = Copyright;
+        itemModel.Image = ContentLink;
+    }
+}
+```
 
 When editing content, the build-in edit mode form is used
 
@@ -258,7 +274,7 @@ Content Manager allows to use custom CSS styles.
 Custom styles can be configured using `module.config` file.
 For example in Alloy module.config:
 
-````
+```xml
 <?xml version="1.0" encoding="utf-8"?>
 <module>
     <assemblies>
@@ -276,16 +292,16 @@ For example in Alloy module.config:
         </paths>
     </dojo>
 </module>
-````
+```
 
 View HTML root element has CSS class name that contains view name, so you can set styles based on that value.
 For example for `Car` view:
 
-````
+```css
 .Cars.dashboard {
      background-color: blue;
 }
-````
+```
 
 ## Using with Commerce
 
@@ -294,7 +310,7 @@ Content Manager can be used to list Episerver Commerce products.
 To configure it, the `ExternalModules` should have Commrce added.
 There is `EnsureCommerceLoaded` helper method that add required modules.
 
-````
+```cs
 [ModuleDependency(typeof(EPiServer.Web.InitializationModule))]
 public class ExternalGridInitialization : IInitializableModule
 {
@@ -312,7 +328,7 @@ public class ExternalGridInitialization : IInitializableModule
     {
     }
 }
-````
+```
 
 ## Content Manager options
 
