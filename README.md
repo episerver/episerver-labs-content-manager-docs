@@ -1,3 +1,5 @@
+> For Grid View docs, please visit [Grid View](GridView.md)
+
 # Episerver Content Manager
 
 ## Install

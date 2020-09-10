@@ -1,3 +1,5 @@
+> For Content Manager docs, please visit [Content Manager](Readme.md)
+
 # Episerver Grid View
 
 ## Install
@@ -6,41 +8,66 @@
 
 Link to [nuget](https://nuget.episerver.com/package/?id=EPiServer.Labs.GridView) package.
 
-Grid View is an addon that simplifies displaying filtered results and 
-allow to show more information about the content in the columns.
+GridView package is an add-on that has several features:
+* [GridView UI search component](#gridview-ui-search-component) - a powerful dgrid-based, fully configurable UI component that flattens the hierarchical structure and displays descendents of the currently selected content item.
+* [GridView Main Navigation Component](#gridview-main-navigation-component) - instead of displaying the site in a hierarchical way the editor will be able to browse it as folders (a bit like Windows Explorer).
+* [Enhanced Properties](#enhanced-properties) - enhanced ContentReference, ContentArea and LinkItemCollection properties - much more powerful way of finding the needed content items
+
+## GridView UI search component
+
+To enable Grid View for all content types, you can set `IsViewEnabled` of
+[GridViewOptions](#gridviewoptions) to true (by default it's false).
+
+But recommended way is to enable custom view only for specific page types. In order to add the UI search component you will just have to register it as a `SearchContentView` and provide a generic type parameter that defines which content types this new View will be applied to.
+For example to add the Grid View to all instances of `StandardPage` you will have to add this code to your site:
+```cs
+[ServiceConfiguration(typeof(ViewConfiguration))]
+public class ContainerGridView : SearchContentView<StandardPage>
+{
+}
+```
 
 ![Grid View](images/grid-view/grid-view.png "Grid View")
 
-## Configuring columns
+### Configuring columns
 
-Grid View allows to define what columns should be showed on the list. 
-For example, editors with multilanguage sites would like to manage languages 
-from the grid. For others, could be properties related with content publication 
-like “Published By” and “Published On”. Also would be good to display 
-properties specific to for the site like “Hero image” or “Short description”.
-To help all editors I allow to configure the columns. You can show, both 
-standard properties like “Name”, “Status”, “Include in menu” and any custom 
-property added to the model.
+It is possible to define which columns are shown in the grid.
+For example, editors with multilanguage sites would like to manage languages from the grid. Others may want to see properties related with content publication like “Published By” and “Published On”. Also would be good to display properties specific to for the site like “Hero image” or “Short description”. 
+
+You can show, both standard properties like “Name”, “Status”, “Include in menu” and any custom property added to the model.
 
 Columns are configured on the server side. To simplify configuration 
-code there is a builder class. The sample columns configuration looks like:
+code there is a builder class. 
 
-````
-Columns = new ColumnsListBuilder()
-    .WithContentName()
-    .WithContentStatus()
-    .WithContentTypeName()
-    .WithVisibleInMenu()
-    .WithCreatedBy()
-    .WithPublishDate()
-    .WithCurrentLanguageBranch()
-    .WithEdit()
-    .WithPreviewUrl()
-    .WithActionMenu()
-    .Build()
+The sample columns configuration for StandardPage looks like this:
+
+```cs
+[UIDescriptorRegistration]
+public class StandardPageGridViewUIEditorDescriptor : ExtendedUIDescriptor<StandardPage>
+{
+    public SitePageDataUIEditorDescriptor()
+        : base(ContentTypeCssClassNames.Page)
+    {
+        GridSettings = new GridSettings
+        {
+            Columns = new ColumnsListBuilder()
+                .WithContentName()
+                .WithContentStatus()
+                .WithContentTypeName()
+                .WithVisibleInMenu()
+                .WithCreatedBy()
+                .WithPublishDate()
+                .WithCurrentLanguageBranch()
+                .WithEdit()
+                .WithPreviewUrl()
+                .WithActionMenu()
+                .Build()
+        };
+    }
+}
 ````
 
-## Column renderers
+### Column renderers
 
 The column is not just property value rendered as a text. There are set 
 of cell renderers for displaying images, content references or dates. 
@@ -58,7 +85,7 @@ The list of built-in renderers is quite long. It inclides renderers like:
 * Dates – formatted date
 * Content Link – with editable and previewable versions
 
-## Custom renderers
+### Custom renderers
 
 Developer can implement custom renderer. For example when ProductPage type 
 has MajorVersion, MinorVersion, Relase Version, BuildVersion integer 
@@ -76,7 +103,7 @@ With custom renderer it will be display like:
 Grid View has context menu available next to current content name and in 
 every row of children. Commands provider is shared between the View and main 
 navigation. It means that view will display same actions as the tree. 
-Even when you implement custom tree context menu action using the 
+Even when you implement custom tree context menu action by the 
 "[epi-cms/plugin-area/navigation-tree](https://world.episerver.com/documentation/developer-guides/CMS/user-interface/plug-in-areas/)"
  it will be showed in the view. 
 For example you can add “Preview” command that opens selected page in View Mode.
@@ -117,6 +144,24 @@ But for Products we show thumbnail, version and and categories:
 
 ![Columns product page](images/grid-view/grid-view-columns-products.png "Columns product page")
 
+#### Set Grid View as a default view
+
+To set Grid View as a default view for a page type, you can use `UIDescriptor`.
+For example, to set Grid View as a default view for folder:
+
+```cs
+[UIDescriptorRegistration]
+public class ContentFolderUIEditorDescriptor : ContentFolderUIDescriptor
+{
+    public ContentFolderUIEditorDescriptor()
+    {
+        DefaultView = SearchContentView.ViewKey;
+    }
+}
+```
+
+As you can see there is a constant for GridView folder name: `SearchContentView.ViewKey`.
+
 ## Navigation tree with locked nodes
 
 For nodes with large number of children expanding child nodes can be turned off. 
@@ -131,7 +176,7 @@ Container pages and have no expand button.
 ![web.config nodes](images/grid-view/grid-view-web.config-ContentContainers.png "web.config nodes")
 
 The Administrators can turn on and off nodes directly through the Edit Mode 
-using “Manage Containers” button manage locked nodes. Of course without 
+by “Manage Containers” button manage locked nodes. Of course without 
 ContentReferences added through web.config which are disabled globally. 
 For them it’s not possible to turn off containers through the UI.
 
@@ -147,7 +192,7 @@ page won’t be a container anymore.
 
 ![using lock nodes](images/grid-view/grid-view-converting-page-to-container.gif "using lock nodes")
 
-## Grid View as MainNavigation Component
+## GridView Main Navigation Component
 
 Custom view give the overview of the children, but it could be useful to 
 locate the content and using D&D add it to the ContentArea. For this reason 
@@ -167,9 +212,9 @@ You can also edit the page, filter the list and get back to edited page context.
 
 ![navigation component drag and drop](images/grid-view/grid-view-navigating-component.gif "navigation component drag and drop")
 
-## Grid View with link properties
+## Enhanced Properties
 
-Selecting content using “Select content” dialog is quite hard when container has more than 30 items.
+Selecting content by “Select content” dialog is quite hard when container has more than 30 items.
 
 ![property content reference](images/grid-view/grid-view-selecting-a-content-from-tree.png "property content reference")
 
@@ -188,7 +233,7 @@ They can be used by adding “GridView” UIHint:
 
 ![property custom ContentReference list](images/grid-view/grid-view-property-ContentReferenceList.png "property custom ContentReference list")
 
-Properties have additional button for selecting content using Grid view. Clicking the button will show the dialog with Gri View.
+Properties have additional button for selecting content in Grid view. Clicking the button will show the dialog with Gri View.
 
 ![custom property selection](images/grid-view/grid-view-property-select-content.png "custom property selection")
 
@@ -211,3 +256,37 @@ of blocks in one folder.
 
 ![Assets pane](images/grid-view/grid-view-blocks-command.png "Assets pane")
 
+## GridViewOptions
+
+GridViewOptions is using Options class to configure some of the features.
+Below is a description of Options properties.
+
+| Property  | Type | Default | Description |
+|---|---|---|---|
+| IsComponentEnabled | bool | true | When true, then navigation component is enabled |
+| IsViewEnabled | bool | true | When true, then custom view is enabled |
+| ContentContainers | string | empty | Coma-separated list of ContentReferences for Content Containers under which the Navigation Tree should not display elements |
+| ChildrenConvertCommandEnabled | bool | true | When true, then convert to children command is enabled |
+
+Example that turns on GridView for all content types:
+```cs
+[ModuleDependency(typeof(InitializationModule))]
+public class GridConfigurableModule : IConfigurableModule
+{
+    public void Initialize(InitializationEngine context)
+    {
+    }
+
+    public void Uninitialize(InitializationEngine context)
+    {
+    }
+
+    public void ConfigureContainer(ServiceConfigurationContext context)
+    {
+        context.Services.Configure<GridViewOptions>(config =>
+        {
+            config.IsViewEnabled = true;
+        });
+    }
+}
+```
