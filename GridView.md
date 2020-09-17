@@ -98,6 +98,8 @@ With custom renderer it will be display like:
 
 ![Custom renderes list](images/grid-view/grid-view-custom-renderes-list.png "Custom renderes list")
 
+Here you can find example about [how to create custom column renderer](GridView_CustomRenderer.md).
+
 ## Grid menu column
 
 Grid View has context menu available next to current content name and in 
