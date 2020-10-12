@@ -149,20 +149,21 @@ But for Products we show thumbnail, version and and categories:
 #### Set Grid View as a default view
 
 To set Grid View as a default view for a page type, you can use `UIDescriptor`.
-For example, to set Grid View as a default view for folder:
+For example, to set Grid View as a default view for `ContainerPage` page type:
 
 ```cs
 [UIDescriptorRegistration]
-public class ContentFolderUIEditorDescriptor : ContentFolderUIDescriptor
+public class ContainerPageUIDescriptor : ExtendedUIDescriptor<ContainerPage>
 {
-    public ContentFolderUIEditorDescriptor()
+    public ContainerPageUIDescriptor()
+        : base(ContentTypeCssClassNames.Container)
     {
-        DefaultView = SearchContentView.ViewKey;
+        DefaultView = SearchContentViewContentData.ViewKey;
     }
 }
 ```
 
-As you can see there is a constant for GridView folder name: `SearchContentView.ViewKey`.
+As you can see there is a constant for GridView view name: `SearchContentViewContentData.ViewKey`.
 
 ## Navigation tree with locked nodes
 
@@ -257,6 +258,32 @@ in Assets Pane. This functionality should help with listing large number
 of blocks in one folder.
 
 ![Assets pane](images/grid-view/grid-view-blocks-command.png "Assets pane")
+
+You can use the same UIDescriptor as for pages/blocks in order to configure the grid:
+
+```cs
+[UIDescriptorRegistration]
+[ServiceConfiguration(typeof(ContentFolderUIDescriptor))]
+public class ContentFolderUIEditorDescriptor : ContentFolderUIDescriptor
+{
+    public ContentFolderUIEditorDescriptor()
+    {
+        GridSettings = new GridSettings
+        {
+            Columns = new ColumnsListBuilder()
+                .WithImage(nameof(BlockBase.MainImage), "SmallThumbnail")
+                .WithContentName()
+                .WithContentStatus()
+                .WithCreatedBy()
+                .WithPublishDate()
+                .WithInlineEdit()
+                .WithEdit("Navigate", ColumnSizeCss.ColumnSize70)
+                .WithActionMenu()
+                .Build()
+        };
+    }
+}
+```
 
 ## GridViewOptions
 
