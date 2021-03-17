@@ -10,8 +10,8 @@ Link to [nuget](https://nuget.episerver.com/package/?id=EPiServer.Labs.GridView)
 
 GridView package is an add-on that has several features:
 * [GridView UI search component](#gridview-ui-search-component) - a powerful dgrid-based, fully configurable UI component that flattens the hierarchical structure and displays descendents of the currently selected content item.
-* [GridView Main Navigation Component](#gridview-main-navigation-component) - instead of displaying the site in a hierarchical way the editor will be able to browse it as folders (a bit like Windows Explorer).
-* [Enhanced Properties](#enhanced-properties) - enhanced ContentReference, ContentArea and LinkItemCollection properties - much more powerful way of finding the needed content items
+* [GridView Main Navigation Component](#gridview-main-navigation-component) - instead of displaying the site in a hierarchical way the editor will be able to browse it as folders (a bit like Windows Explorer). This component also uses the grid and can be configured independently (editor might only need several basic columns here).
+* [Enhanced Properties](#enhanced-properties) - enhanced ContentReference, ContentArea and LinkItemCollection properties - much more powerful way of finding the needed content items. Each property is also configurable so only include the data that make sense in a given context.
 
 ## GridView UI search component
 
@@ -32,7 +32,9 @@ public class ContainerGridView : SearchContentView<StandardPage>
 ### Configuring columns
 
 It is possible to define which columns are shown in the grid.
-For example, editors with multilanguage sites would like to manage languages from the grid. Others may want to see properties related with content publication like “Published By” and “Published On”. Also would be good to display properties specific to for the site like “Hero image” or “Short description”. 
+For example, editors with multilanguage sites would like to manage languages from the grid. 
+Others may want to see properties related with content publication like “Published By” and “Published On”. 
+Also would be good to display properties specific to for the site like “Hero image” or “Short description”. 
 
 You can show, both standard properties like “Name”, “Status”, “Include in menu” and any custom property added to the model.
 
@@ -221,18 +223,44 @@ Selecting content by “Select content” dialog is quite hard when container ha
 
 ![property content reference](images/grid-view/grid-view-selecting-a-content-from-tree.png "property content reference")
 
-There are versions for ContentReference, ContentArea and ContentReference list properties. 
-They can be used by adding “GridView” UIHint:
+There are versions for ContentReference, PageReference, ContentArea and ContentReference list properties. 
+They can be used by adding `GridViewEditing.UIHint` UIHint (which is `“GridView”` string):
 
-* ContentReference
+* ContentReference and PageReference
+
+ContentReference:
+````cs
+[UIHint(GridViewEditing.UIHint)]
+[PropertyGridConfiguration]
+public virtual ContentReference ContentReference1 { get; set; }
+````
+
+PageReference:
+````cs
+[UIHint(GridViewEditing.UIHint)]
+[PropertyGridConfiguration]
+public virtual PageReference PageReference1 { get; set; }
+````
 
 ![property custom content reference](images/grid-view/grid-view-property-ContentReference.png "property custom content reference")
 
 * ContentArea
 
+````cs
+[UIHint(GridViewEditing.UIHint)]
+[PropertyGridConfiguration]
+public virtual ContentArea ContentArea1 { get; set; }
+````
+
 ![property custom ContentArea](images/grid-view/grid-view-property-ContentArea.png "property custom ContentArea")
 
 * ContentReference list
+
+````cs
+[UIHint(GridViewEditing.UIHint)]
+[PropertyGridConfiguration]
+public virtual IEnumerable<ContentReference> ContentReferenceList1 { get; set; }
+````
 
 ![property custom ContentReference list](images/grid-view/grid-view-property-ContentReferenceList.png "property custom ContentReference list")
 
@@ -248,6 +276,35 @@ Below is a demo of adding item to ContentReference property:
 You can define starting point for properties. For example for “Featured Articles” 
 we would like to show the dialog with “News” container while for “Product links” 
 property from the “Products” container.
+
+To change root page for content list in property dialog the `IChildrenGridPropertyRootResolver`
+has to be implemented. Interface has one method `GetRoot` which returns root ContentReference in context of property.
+It means that properties can have different roots.
+
+For example:
+````cs
+using EPiServer.Core;
+using EPiServer.Labs.GridView.EditorDescriptors;
+using EPiServer.ServiceLocation;
+
+namespace Alloy
+{
+    [ServiceConfiguration(typeof(IChildrenGridPropertyRootResolver))]
+    public class CarsRootResolver: IChildrenGridPropertyRootResolver
+    {
+        public ContentReference GetRoot(IContent content, string propertyName)
+        {
+            if (propertyName.Equals(nameof(GridPropertiesTestPage.ContentArea1)) && content is GridPropertiesTestPage)
+            {
+                // get value from web.config or database
+                return new ContentReference(123);
+            }
+
+            return null;
+        }
+    }
+}
+````
 
 ![custom properties root](images/grid-view/grid-view-different-starting-points.gif "custom properties root")
 
