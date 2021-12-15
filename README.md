@@ -36,7 +36,7 @@ By default there are four tabs:
 
 Tabs on dashboard are configurable. You can hide them or change their order.
 To do that you need to configure `AvailableGadgets` option value:
-```cs
+```c#
 AvailableGadgets => new[]
 
 {
@@ -54,7 +54,7 @@ and then list of tasks.
 When using full text search, user automatically gets search suggestions.
 Suggestion are enabled by default, but they can be turned off using options:
 
-```cs
+```c#
 context.Services.Configure<ContentManagerOptions>((options) =>
 {
     options.NotificationReceiversRoles = new[] { "WebEditors" };
@@ -111,7 +111,7 @@ To make implementation simpler, the class can inherit from `ContentManagerViewCo
 that already implements `IContentManagerViewConfiguration` interface. 
 Below is an example of view that displays cars blocks:
 
-```cs
+```c#
 [ServiceConfiguration(typeof(IContentManagerViewConfiguration))]
 public class CarsView : ContentManagerViewConfigurationBase
 {
@@ -223,7 +223,7 @@ The interface has `SetItem` method called when item properties are set.
 
 For example on ArticlePage:
 
-```cs
+```c#
 [SiteContentType(
     GroupName = Global.GroupNames.News,
     GUID = "AEECADF2-3E89-4117-ADEB-F8D43565D2F4")]
@@ -239,7 +239,7 @@ public class ArticlePage : StandardPage, IDashboardItem
 ```
 
 And it's the same if you wish to display media files:
-```cs
+```c#
 [ContentType(GUID = "0A89E464-56D4-449F-AEA8-2BF774AB8730")]
 [MediaDescriptor(ExtensionString = "jpg,jpeg,jpe,ico,gif,bmp,png")]
 public class ImageFile : ImageData, IDashboardItem
@@ -312,7 +312,7 @@ Content Manager can be used to list Episerver Commerce products.
 To configure it, the `ExternalModules` should have Commrce added.
 There is `EnsureCommerceLoaded` helper method that add required modules.
 
-```cs
+```c#
 [ModuleDependency(typeof(EPiServer.Web.InitializationModule))]
 public class ExternalGridInitialization : IInitializableModule
 {
