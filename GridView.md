@@ -1,4 +1,4 @@
-> For Content Manager docs, please visit [Content Manager](Readme.md)
+> For Content Manager docs, please visit [Content Manager](https://github.com/episerver/episerver-labs-content-manager-docs/blob/master/README.md)
 
 # Episerver Grid View
 
