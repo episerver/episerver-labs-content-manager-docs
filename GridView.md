@@ -20,7 +20,7 @@ To enable Grid View for all content types, you can set `IsViewEnabled` of
 
 But recommended way is to enable custom view only for specific page types. In order to add the UI search component you will just have to register it as a `SearchContentView` and provide a generic type parameter that defines which content types this new View will be applied to.
 For example to add the Grid View to all instances of `StandardPage` you will have to add this code to your site:
-```cs
+```c#
 [ServiceConfiguration(typeof(ViewConfiguration))]
 public class ContainerGridView : SearchContentView<StandardPage>
 {
@@ -43,7 +43,7 @@ code there is a builder class.
 
 The sample columns configuration for StandardPage looks like this:
 
-```cs
+```c#
 [UIDescriptorRegistration]
 public class StandardPageGridViewUIEditorDescriptor : ExtendedUIDescriptor<StandardPage>
 {
@@ -67,7 +67,7 @@ public class StandardPageGridViewUIEditorDescriptor : ExtendedUIDescriptor<Stand
         };
     }
 }
-````
+```
 
 ### Column renderers
 
@@ -153,7 +153,7 @@ But for Products we show thumbnail, version and and categories:
 To set Grid View as a default view for a page type, you can use `UIDescriptor`.
 For example, to set Grid View as a default view for `ContainerPage` page type:
 
-```cs
+```c#
 [UIDescriptorRegistration]
 public class ContainerPageUIDescriptor : ExtendedUIDescriptor<ContainerPage>
 {
@@ -207,6 +207,27 @@ Grid View can be registered in the navigation pane.
 
 Columns are also configurable, so you can extend the pane to have more information about the content.
 
+```c#
+public class CustomComponentConfigurationResolver: IComponentConfigurationResolver
+{
+    public GridSettings GridSettings => new GridSettings
+    {
+        Columns = new ColumnsListBuilder()
+            .WithContentName()
+            .WithCreatedBy()
+            .WithContentStatus()
+            .WithActionMenu()
+            .Build()
+    };
+}
+```
+
+This class needs to be registered in the container, for example:
+
+```c#
+services.AddTransient<IComponentConfigurationResolver, CustomComponentConfigurationResolver>();
+```
+
 ![navigation component configuring columns](images/grid-view/grid-view-main-navigation-component-with-columns.png "navigation component configuring columns")
 
 You can use search to filter the list and D&D items to ContentReference properties.
@@ -229,38 +250,38 @@ They can be used by adding `GridViewEditing.UIHint` UIHint (which is `“GridVie
 * ContentReference and PageReference
 
 ContentReference:
-````cs
+```c#
 [UIHint(GridViewEditing.UIHint)]
 [PropertyGridConfiguration]
 public virtual ContentReference ContentReference1 { get; set; }
-````
+```
 
 PageReference:
-````cs
+```c#
 [UIHint(GridViewEditing.UIHint)]
 [PropertyGridConfiguration]
 public virtual PageReference PageReference1 { get; set; }
-````
+```
 
 ![property custom content reference](images/grid-view/grid-view-property-ContentReference.png "property custom content reference")
 
 * ContentArea
 
-````cs
+```c#
 [UIHint(GridViewEditing.UIHint)]
 [PropertyGridConfiguration]
 public virtual ContentArea ContentArea1 { get; set; }
-````
+```
 
 ![property custom ContentArea](images/grid-view/grid-view-property-ContentArea.png "property custom ContentArea")
 
 * ContentReference list
 
-````cs
+```c#
 [UIHint(GridViewEditing.UIHint)]
 [PropertyGridConfiguration]
 public virtual IEnumerable<ContentReference> ContentReferenceList1 { get; set; }
-````
+```
 
 ![property custom ContentReference list](images/grid-view/grid-view-property-ContentReferenceList.png "property custom ContentReference list")
 
@@ -282,7 +303,7 @@ has to be implemented. Interface has one method `GetRoot` which returns root Con
 It means that properties can have different roots.
 
 For example:
-````cs
+```c#
 using EPiServer.Core;
 using EPiServer.Labs.GridView.EditorDescriptors;
 using EPiServer.ServiceLocation;
@@ -304,7 +325,7 @@ namespace Alloy
         }
     }
 }
-````
+```
 
 ![custom properties root](images/grid-view/grid-view-different-starting-points.gif "custom properties root")
 
@@ -318,7 +339,7 @@ of blocks in one folder.
 
 You can use the same UIDescriptor as for pages/blocks in order to configure the grid:
 
-```cs
+```c#
 [UIDescriptorRegistration]
 [ServiceConfiguration(typeof(ContentFolderUIDescriptor))]
 public class ContentFolderUIEditorDescriptor : ContentFolderUIDescriptor
@@ -355,7 +376,7 @@ Below is a description of Options properties.
 | ChildrenConvertCommandEnabled | bool | true | When true, then convert to children command is enabled |
 
 Example that turns on GridView for all content types:
-```cs
+```c#
 [ModuleDependency(typeof(InitializationModule))]
 public class GridConfigurableModule : IConfigurableModule
 {
