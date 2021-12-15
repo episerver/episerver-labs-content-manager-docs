@@ -309,7 +309,7 @@ For example for `Car` view:
 
 Content Manager can be used to list Episerver Commerce products.
 
-To configure it, the `ExternalModules` should have Commrce added.
+To configure it, the `ExternalModules` should contain the Commerce ShellModule.
 There is `EnsureCommerceLoaded` helper method that add required modules.
 
 ```c#
@@ -319,7 +319,7 @@ public class ExternalGridInitialization : IInitializableModule
     public void Initialize(InitializationEngine context)
     {
         var contentOptions = ServiceLocator.Current.GetInstance<ContentManagerOptions>();
-        contentOptions.EnsureCommerceLoaded();
+        contentOptions.EnsureCommerceLoaded(); // equivalent to contentOptions.ExternalModules.Add("EPiServer.Commerce.Shell");
     }
 
     public void Uninitialize(InitializationEngine context)
@@ -348,4 +348,4 @@ Below is a description of Options properties.
 | NotificationReceiversRoles | IEnumerable<string> | empty | List of roles notified by Content Manager comments |
 | CustomViewsFolderName | string | CustomExternalViews | Folder name used by blocks view provider |
 | UrlPrefix | string | content | URL prefix added to Content Manager addon pages |
-| ExternalModules | string | empty | External dojo modules initialized by Content Manager |
+| ExternalModules | string[] | empty | External dojo modules initialized by Content Manager |
