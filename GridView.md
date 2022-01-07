@@ -69,6 +69,19 @@ public class StandardPageGridViewUIEditorDescriptor : ExtendedUIDescriptor<Stand
 }
 ```
 
+All custom properties that you want to use (for example in the `WithImage` call) has to be returned by the server api.
+Please annotate the properties with `[IncludeInQueryResult]` In order to make sure that they are included in the query results.
+
+For example:
+```c#
+[Display(
+    GroupName = SystemTabNames.Content,
+    Order = 100)]
+[UIHint(UIHint.Image)]
+[EPiServer.Labs.GridView.ChildrenStore.IncludeInQueryResult]
+public virtual ContentReference PageImage { get; set; }
+```
+
 ### Column renderers
 
 The column is not just property value rendered as a text. There are set 
